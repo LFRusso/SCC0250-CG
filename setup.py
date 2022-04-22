@@ -41,6 +41,13 @@ class Graphics:
                                             0.0,    0.0,      z, 0.0, 
                                             0.0,    0.0,    0.0, 1.0], np.float32)
         return
+
+    def matMul(self, a, b):
+        m_a = a.reshape(4,4)
+        m_b = b.reshape(4,4)
+        m_c = np.dot(m_a,m_b)
+        c = m_c.reshape(1,16)
+        return c
     
     def addShaders(self, vertex_src, fragment_src):
         # Set shaders source
@@ -96,18 +103,17 @@ class Graphics:
         return
 
     def getUniformLocation(self, identifier):
-        return glGetUniformLocation(program, identifier)
+        return glGetUniformLocation(self.program, identifier)
 
     def mainLoop(self, items):
         glEnable(GL_DEPTH_TEST)
-        glClearColor(0.0,0.1,0.1,1)
+        glClearColor(1.0, 1.0, 1.0, 1.0)
         while not glfw.window_should_close(self.window):
             glfw.poll_events() 
             
-            for item in items:
-                item.action()
-            glRotatef(1, 3, 1, 1)
             glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
+            for item in items:
+                item.action(self)
 
             glfw.swap_buffers(self.window)
         glfw.terminate()
