@@ -2,17 +2,17 @@ import numpy as np
 from OpenGL.GL import *
 import OpenGL.GL.shaders
 from OpenGL.GLU import *
+import pyrr
 
 class Item:
-    def __init__(self, vertices=None, edges=None, colors=None):
-        self.vertices = np.array(vertices, np.float32)
-        self.edges = np.array(edges, np.float32)
-        self.colors = np.array(colors, np.float32)
-        self.action = None
+    def __init__(self, position):
+        self.position = position
+
     
-    def translate(self, v):
-        new_vertices = np.dot(self.T(*v).reshape(4,4),self.vertices.T)
-        self.vertices = new_vertices.T
+    def translate(self, G, v):
+        loc = glGetUniformLocation(G.program, "mat_transformation")
+        #new_vertices = np.dot(self.T(*v).reshape(4,4),self.vertices.T)
+        #self.vertices = new_vertices.T
         return
 
     def scale(self, v):
@@ -77,13 +77,13 @@ class Cube(Item):
             (+0.2, +0.2, -0.2)]
 
     def action(self, G, *args):
-        loc_color = glGetUniformLocation(G.program, "color")
+        loc_color = glGetUniformLocation(G.program, "a_texture")
 
         self.d -= 0.01
         mat_transform = G.matMul(G.Rz(self.d), G.Ry(self.d))
         mat_transform = G.matMul(G.Rx(self.d), mat_transform)
 
-        loc = glGetUniformLocation(G.program, "mat_transformation")
+        loc = glGetUniformLocation(G.program, "projection")
         glUniformMatrix4fv(loc, 1, GL_TRUE, mat_transform)
 
  

@@ -1,3 +1,5 @@
 numpy
 glfw
 PyOpenGL
+pynput
+pyrr
