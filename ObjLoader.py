@@ -60,6 +60,21 @@ class ObjLoader:
             end = start + 8
             print(buffer[start:end])
 
+    @staticmethod
+    def get_normals(indices_data, vertices, normals):
+        num_verts = len(vertices) // 3
+        num_normals = len(indices_data) // 3
+        
+        v = np.reshape(vertices, (num_verts, 3))
+        
+        for i1 in range(num_normals):
+            start = i1 * 3
+            end = start + 3
+            v1, v2, v3 = v[indices_data[start:end]]
+            edge1 = v1-v2
+            edge2 = v1-v3
+
+            normals += list(np.cross(edge1, edge2))
 
     @staticmethod
     def load_model(file, sorted=True):
@@ -75,28 +90,52 @@ class ObjLoader:
             line = f.readline()
             while line:
                 values = line.split()
-                if values[0] == 'v':
-                    ObjLoader.search_data(values, vert_coords, 'v', 'float')
-                elif values[0] == 'vt':
-                    ObjLoader.search_data(values, tex_coords, 'vt', 'float')
-                elif values[0] == 'vn':
-                    ObjLoader.search_data(values, norm_coords, 'vn', 'float')
-                elif values[0] == 'f':
-                    for value in values[1:]:
-                        val = value.split('/')
-                        ObjLoader.search_data(val, all_indices, 'f', 'int')
-                        indices.append(int(val[0])-1)
-
+                try:
+                    if values[0] == 'v':
+                        ObjLoader.search_data(values, vert_coords, 'v', 'float')
+                    elif values[0] == 'vt':
+                        ObjLoader.search_data(values, tex_coords, 'vt', 'float')
+                    elif values[0] == 'vn':
+                        ObjLoader.search_data(values, norm_coords, 'vn', 'float')
+                    elif values[0] == 'f':
+                        for value in values[1:]:
+                            if '/' not in value: # vertex and index only
+                                val = value
+                                ObjLoader.search_data([val], all_indices, 'f', 'int')
+                                indices.append(int(val)-1)
+                            elif '//' not in value:
+                                val = value.split('/')
+                                if(len(val) == 2):
+                                    val = [val[0], val[1], '1']
+                                    ObjLoader.search_data(val, all_indices, 'f', 'int')
+                                    indices.append(int(val[0])-1)
+                                else:
+                                    #print(val)
+                                    ObjLoader.search_data(val, all_indices, 'f', 'int')
+                                    indices.append(int(val[0])-1)
+                            else:
+                                val = value.split('//')
+                                val = [val[0], '1', val[1]]
+                                #print(val)
+                                ObjLoader.search_data(val, all_indices, 'f', 'int')
+                                indices.append(int(val[0])-1)
+                except:
+                    pass
                 line = f.readline()
 
+        #print(len(norm_coords), len(indices))
+        #print(tex_coords)
+        if len(tex_coords) == 0:
+            tex_coords = [0.,0.]*len(indices)
+        if len(norm_coords) == 0:
+            ObjLoader.get_normals(indices, vert_coords, norm_coords)
+       
         if sorted:
             # use with glDrawArrays
             ObjLoader.create_sorted_vertex_buffer(all_indices, vert_coords, tex_coords, norm_coords)
         else:
             # use with glDrawElements
             ObjLoader.create_unsorted_vertex_buffer(all_indices, vert_coords, tex_coords, norm_coords)
-
-        # ObjLoader.show_buffer_data(ObjLoader.buffer)
 
         buffer = ObjLoader.buffer.copy() # create a local copy of the buffer list, otherwise it will overwrite the static field buffer
         ObjLoader.buffer = [] # after copy, make sure to set it back to an empty list
