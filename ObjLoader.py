@@ -101,7 +101,7 @@ class ObjLoader:
                         for value in values[1:]:
                             if '/' not in value: # vertex and index only
                                 val = value
-                                ObjLoader.search_data([val], all_indices, 'f', 'int')
+                                ObjLoader.search_data([val, val, '1'], all_indices, 'f', 'int')
                                 indices.append(int(val)-1)
                             elif '//' not in value:
                                 val = value.split('/')
@@ -110,26 +110,22 @@ class ObjLoader:
                                     ObjLoader.search_data(val, all_indices, 'f', 'int')
                                     indices.append(int(val[0])-1)
                                 else:
-                                    #print(val)
                                     ObjLoader.search_data(val, all_indices, 'f', 'int')
                                     indices.append(int(val[0])-1)
                             else:
                                 val = value.split('//')
-                                val = [val[0], '1', val[1]]
-                                #print(val)
+                                val = [val[0], val[0], val[1]]
                                 ObjLoader.search_data(val, all_indices, 'f', 'int')
                                 indices.append(int(val[0])-1)
                 except:
                     pass
                 line = f.readline()
 
-        #print(len(norm_coords), len(indices))
-        #print(tex_coords)
         if len(tex_coords) == 0:
             tex_coords = [0.,0.]*len(indices)
         if len(norm_coords) == 0:
             ObjLoader.get_normals(indices, vert_coords, norm_coords)
-       
+
         if sorted:
             # use with glDrawArrays
             ObjLoader.create_sorted_vertex_buffer(all_indices, vert_coords, tex_coords, norm_coords)

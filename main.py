@@ -46,13 +46,13 @@ house_pos = pyrr.matrix44.create_from_translation(pyrr.Vector3([15, 0, -11]))
 house_indices, house_buffer = ObjLoader.load_model("meshes/house.obj")
 house = House(house_pos, house_indices, house_buffer, "textures/brick.jpg")
 
-floor_pos = pyrr.matrix44.create_from_translation(pyrr.Vector3([0, 0, 0]))
+floor_pos = pyrr.matrix44.create_from_translation(pyrr.Vector3([0, 0, -10]))
 floor_indices, floor_buffer = ObjLoader.load_model("meshes/floor.obj")
 floor = Item(floor_pos, floor_indices, floor_buffer, "textures/grass.jpg")
 
-tree_pos = pyrr.matrix44.create_from_translation(pyrr.Vector3([-10, 0, -11]))
-tree_indices, tree_buffer = ObjLoader.load_model("meshes/tree.obj")
-tree = Tree(tree_pos, tree_indices, tree_buffer, "textures/grass.jpg")
+tree_pos = pyrr.matrix44.create_from_translation(pyrr.Vector3([-10, 0, -20]))
+tree_indices, tree_buffer = ObjLoader.load_model("meshes/trees.obj")
+tree = Tree(tree_pos, tree_indices, tree_buffer, "textures/trees.png")
 
 mug_pos = pyrr.matrix44.create_from_translation(pyrr.Vector3([15, 1.5, -5]))
 mug_indices, mug_buffer = ObjLoader.load_model("meshes/mug.obj")

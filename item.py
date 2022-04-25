@@ -111,7 +111,8 @@ class Teapot(Item):
 
 class Tree(Item):
     def onSpawn(self, G, *args):
-        self.scale([.3,.3,.3])
+        self.scale([10,10,10])
+        self.rotx(1.5)
         return
 
 class Mug(Item):
