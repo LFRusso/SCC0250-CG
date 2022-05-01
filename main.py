@@ -34,6 +34,7 @@ fragment_src = """
         }
         """
 
+# Carregando malhas e texturas das figuras
 teapot_pos = pyrr.matrix44.create_from_translation(pyrr.Vector3([-3, 1.6, -12]))
 teapot_indices, teapot_buffer = ObjLoader.load_model("meshes/teapot.obj")
 teapot = Teapot(teapot_pos, teapot_indices, teapot_buffer, "textures/crate.jpg")
@@ -58,5 +59,6 @@ mug_pos = pyrr.matrix44.create_from_translation(pyrr.Vector3([15, 1.5, -5]))
 mug_indices, mug_buffer = ObjLoader.load_model("meshes/mug.obj")
 mug = Mug(mug_pos, mug_indices, mug_buffer, "textures/crate.jpg")
 
+# Construindo e e executando loop do jogo
 G = Graphics(700, 700, "Game", vertex_src, fragment_src, [tree, floor, table, house, teapot, mug])
 G.mainLoop()

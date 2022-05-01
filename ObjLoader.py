@@ -30,36 +30,6 @@ class ObjLoader:
                 end = start + 3
                 ObjLoader.buffer.extend(normals[start:end])
 
-
-    @staticmethod # TODO unsorted vertex buffer for use with glDrawElements function
-    def create_unsorted_vertex_buffer(indices_data, vertices, textures, normals):
-        num_verts = len(vertices) // 3
-
-        for i1 in range(num_verts):
-            start = i1 * 3
-            end = start + 3
-            ObjLoader.buffer.extend(vertices[start:end])
-
-            for i2, data in enumerate(indices_data):
-                if i2 % 3 == 0 and data == i1:
-                    start = indices_data[i2 + 1] * 2
-                    end = start + 2
-                    ObjLoader.buffer.extend(textures[start:end])
-
-                    start = indices_data[i2 + 2] * 3
-                    end = start + 3
-                    ObjLoader.buffer.extend(normals[start:end])
-
-                    break
-
-
-    @staticmethod
-    def show_buffer_data(buffer):
-        for i in range(len(buffer)//8):
-            start = i * 8
-            end = start + 8
-            print(buffer[start:end])
-
     @staticmethod
     def get_normals(indices_data, vertices, normals):
         num_verts = len(vertices) // 3
@@ -77,13 +47,13 @@ class ObjLoader:
             normals += list(np.cross(edge1, edge2))
 
     @staticmethod
-    def load_model(file, sorted=True):
-        vert_coords = [] # will contain all the vertex coordinates
-        tex_coords = [] # will contain all the texture coordinates
-        norm_coords = [] # will contain all the vertex normals
+    def load_model(file):
+        vert_coords = [] # vertex coordinates
+        tex_coords = [] # texture coordinates
+        norm_coords = [] # vertex normals
 
-        all_indices = [] # will contain all the vertex, texture and normal indices
-        indices = [] # will contain the indices for indexed drawing
+        all_indices = [] # vertex, texture and normal indices
+        indices = [] # indices for indexed drawing
 
 
         with open(file, 'r') as f:
@@ -126,15 +96,10 @@ class ObjLoader:
         if len(norm_coords) == 0:
             ObjLoader.get_normals(indices, vert_coords, norm_coords)
 
-        if sorted:
-            # use with glDrawArrays
-            ObjLoader.create_sorted_vertex_buffer(all_indices, vert_coords, tex_coords, norm_coords)
-        else:
-            # use with glDrawElements
-            ObjLoader.create_unsorted_vertex_buffer(all_indices, vert_coords, tex_coords, norm_coords)
+        ObjLoader.create_sorted_vertex_buffer(all_indices, vert_coords, tex_coords, norm_coords)
 
-        buffer = ObjLoader.buffer.copy() # create a local copy of the buffer list, otherwise it will overwrite the static field buffer
-        ObjLoader.buffer = [] # after copy, make sure to set it back to an empty list
+        buffer = ObjLoader.buffer.copy() 
+        ObjLoader.buffer = [] 
 
         return np.array(indices, dtype='uint32'), np.array(buffer, dtype='float32')
 

@@ -7,7 +7,7 @@ import numpy as np
 import pyrr
 
 from camera import Camera
-from TextureLoader import load_texture
+from Texture import load_texture
 
 class Graphics:
     def __init__(self, width, height, title, vertex_src, fragment_src, items):
@@ -31,10 +31,10 @@ class Graphics:
         glfw.set_window_size_callback(self.window, self._window_resize_clb)
         glfw.set_key_callback(self.window, self._keyboard_clb)
 
-        # capture the mouse cursor
+        # Escontendo cursor do mouse dentro da janela
         glfw.set_input_mode(self.window, glfw.CURSOR, glfw.CURSOR_DISABLED)
 
-        # make the context current
+        # Definindo contexto atual
         glfw.make_context_current(self.window)
         glfw.show_window(self.window)
 
@@ -46,12 +46,14 @@ class Graphics:
 
         return
 
+    # Redimensionamento da janela
     def _window_resize_clb(self, window, width, height):
         glViewport(0, 0, width, height)
         projection = pyrr.matrix44.create_perspective_projection_matrix(45, width / height, 0.1, 100)
         glUniformMatrix4fv(self.proj_loc, 1, GL_FALSE, projection)
         return
         
+    # Apertando botão do teclado
     def _keyboard_clb(self, window, key, scancode, action, mode):
         global left, right, forward, backward
         if (key == glfw.KEY_ESCAPE or key == glfw.KEY_Q) and action == glfw.PRESS:
@@ -78,6 +80,7 @@ class Graphics:
             item.processInput(self, key)
         return
 
+    # Movimento do mouse
     def _mouse_look_clb(self, window, xpos, ypos):
         if self.first_mouse:
             self.lastX = xpos
@@ -92,6 +95,7 @@ class Graphics:
         self.camera.process_mouse_movement(xoffset, yoffset)
         return
 
+    # Mouse entra na janela do jogo
     def _mouse_enter_clb(self, window, entered):
         if entered:
             self.first_mouse = False
@@ -121,14 +125,15 @@ class Graphics:
         item.onSpawn(self)
         return
     
+    # Adiciona um objeto da classe Item ao cenário
     def _render_item(self, item, index):
         glBindVertexArray(self.VAO[index])
         glBindTexture(GL_TEXTURE_2D, self.textures[index])
         glUniformMatrix4fv(self.model_loc, 1, GL_FALSE, item.position)
         glDrawArrays(GL_TRIANGLES, 0, len(item.indices))
 
+    # Compila e adiciona os shaders
     def _add_shaders(self, vertex_src, fragment_src, buffers):
-            
         self.shader = compileProgram(compileShader(vertex_src, GL_VERTEX_SHADER), compileShader(fragment_src, GL_FRAGMENT_SHADER))
 
         # Make the default program
@@ -150,6 +155,7 @@ class Graphics:
         glUniformMatrix4fv(self.proj_loc, 1, GL_FALSE, self.projection)
         return
 
+    # Definição do movimento da posição xyz câmera com o teclado
     def move(self):
         if self.left:
             self.camera.process_keyboard("LEFT", 0.1)
@@ -170,12 +176,16 @@ class Graphics:
 
             glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT)
 
+            # Matriz de transformação referente à posição da câmera; alterada à cada movimento
+            # equivalente à aplicar transformação em todo o cenário
             view = self.camera.get_view_matrix()
             glUniformMatrix4fv(view_loc, 1, GL_FALSE, view)
             
+            # Desenhando todos os items no cenário
             for i, item in enumerate(self.items):
                 self._render_item(item, i)
 
+            # Ações dos itens independentes do usuáiro (rodar, se mover, etc)
             for item in self.items:
                 item.playAction(self)
             

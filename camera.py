@@ -1,3 +1,5 @@
+# Transofrmas entradas do jogador em tranformações referentes à movimentação de uma câmera do estilo FPS 
+
 from pyrr import Vector3, vector, vector3, matrix44
 from math import sin, cos, radians
 
@@ -40,7 +42,6 @@ class Camera:
         self.camera_right = vector.normalise(vector3.cross(self.camera_front, Vector3([0.0, 1.0, 0.0])))
         self.camera_up = vector.normalise(vector3.cross(self.camera_right, self.camera_front))
 
-    # Camera method for the WASD movement
     def process_keyboard(self, direction, velocity):
         if direction == "FORWARD":
             self.camera_pos += self.camera_front * velocity
